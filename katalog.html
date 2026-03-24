@@ -180,7 +180,7 @@
         // ==========================================
         // 1. PASTE URL WEB APP APPS SCRIPT DI SINI
         // ==========================================
-        const WEB_APP_URL = "ISI_DENGAN_URL_WEB_APP_ANDA";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZsZo5D5fu3aUk4_3KocsAEEvo-UhNjmMcphmyzAHaTX8kPBo_k-_u70U0wkyWuZoAaQ/exec";
         
         let productsData = []; // Menyimpan data dari sheet
         let settingsData = {};
@@ -192,7 +192,7 @@
 
         async function fetchData() {
             try {
-                if(WEB_APP_URL === "ISI_DENGAN_URL_WEB_APP_ANDA") {
+                if(WEB_APP_URL === "https://script.google.com/macros/s/AKfycbxZsZo5D5fu3aUk4_3KocsAEEvo-UhNjmMcphmyzAHaTX8kPBo_k-_u70U0wkyWuZoAaQ/exec") {
                     document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center py-12 text-red-500 font-600">Harap isi WEB_APP_URL di file HTML.</div>`;
                     return;
                 }
