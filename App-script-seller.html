@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title akan diupdate JS -->
+    <title id="page-title">Website & Landing Page dari Google Sheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        forest: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#166534', 800: '#14532d', 900: '#052e16' },
+                        cream: '#fefdfb', sand: '#f8f6f1'
+                    },
+                    fontFamily: {
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                        body: ['DM Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root { --bg: #fefdfb; --fg: #0f2922; --muted: #5a6b65; --accent: #166534; --accent-light: #22c55e; --card: #ffffff; --border: #e2e8f0; }
+        * { fontFamily: 'DM Sans', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-display { fontFamily: 'Plus Jakarta Sans', sans-serif; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+        
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .animate-fade-up, .animate-scale-in { animation: none !important; opacity: 1 !important; transform: none !important; }
+            .carousel-track { transition: none !important; }
+            .faq-content { transition: none !important; }
+        }
+
+        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(22, 101, 52, 0.4); } 50% { box-shadow: 0 0 0 12px rgba(22, 101, 52, 0); } }
+        .pulse-glow { animation: pulse-glow 2s infinite; }
+
+        .sticky-cta { transform: translateY(100%); transition: transform 0.3s ease-out; }
+        .sticky-cta.visible { transform: translateY(0); }
+
+        .video-container { position: relative; background: linear-gradient(135deg, #166534 0%, #052e16 100%); }
+        .video-container::before {
+            content: ''; position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.05; pointer-events: none;
+        }
+
+        .play-btn { transition: all 0.3s ease; }
+        .play-btn:hover { transform: scale(1.1); box-shadow: 0 0 40px rgba(255, 255, 255, 0.3); }
+        .comparison-card { transition: all 0.3s ease; }
+        .comparison-card:hover { transform: translateY(-4px); }
+
+        .timeline-dot { position: relative; }
+        .timeline-dot::before { content: ''; position: absolute; left: 50%; top: 100%; width: 2px; height: 40px; background: linear-gradient(to bottom, #166534, transparent); transform: translateX(-50%); }
+        .timeline-item:last-child .timeline-dot::before { display: none; }
+
+        .countdown-box { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #f59e0b; }
+
+        .btn-primary { text-decoration: none !important; background: linear-gradient(135deg, #166534 0%, #14532d 100%); color: #ffffff !important; transition: all 0.3s ease; }
+        .btn-primary:hover { background: linear-gradient(135deg, #14532d 0%, #052e16 100%); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(22, 101, 52, 0.35); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-secondary { text-decoration: none !important; background: transparent; color: #166534 !important; border: 2px solid #166534; transition: all 0.3s ease; }
+        .btn-secondary:hover { background: #f0fdf4; transform: translateY(-2px); }
+        .section-divider { height: 1px; background: linear-gradient(to right, transparent, #e2e8f0, transparent); }
+
+        .grain-overlay { position: fixed; inset: 0; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); z-index: 9999; }
+        .trust-badge { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; }
+
+        /* DYNAMIC BACKGROUND BLOBS */
+        .bg-blobs { position: fixed; inset: 0; z-index: -3; overflow: hidden; pointer-events: none; background-color: var(--bg); }
+        .blob { position: absolute; filter: blur(90px); border-radius: 50%; opacity: 0.5; animation: float-blob 20s infinite ease-in-out alternate; will-change: transform; }
+        .blob-1 { width: 40vw; height: 40vw; background: #dcfce7; top: -10%; left: -10%; animation-delay: 0s; }
+        .blob-2 { width: 50vw; height: 50vw; background: #bbf7d0; bottom: -20%; right: -10%; animation-duration: 25s; animation-delay: -5s; }
+        .blob-3 { width: 35vw; height: 35vw; background: #fef3c7; top: 20%; right: 20%; animation-duration: 30s; animation-delay: -10s; }
+        @keyframes float-blob { 0% { transform: translate(0, 0) scale(1); } 33% { transform: translate(3vw, -5vh) scale(1.1); } 66% { transform: translate(-2vw, 4vh) scale(0.9); } 100% { transform: translate(0, 0) scale(1); } }
+
+        /* FAQ STYLES */
+        .faq-list { display: flex; flex-direction: column; gap: 12px; }
+        .faq-item { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; transition: all 0.3s ease; }
+        .faq-item:hover { border-color: #bbf7d0; box-shadow: 0 4px 12px rgba(22, 101, 52, 0.08); }
+        .faq-item.is-open { border-color: #166534; box-shadow: 0 6px 20px rgba(22, 101, 52, 0.12); }
+        .faq-trigger { width: 100%; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: transparent; border: none; cursor: pointer; text-align: left; transition: background 0.2s ease; }
+        .faq-trigger:hover { background: #f9fafb; }
+        .faq-trigger:focus { outline: none; }
+        .faq-trigger:focus-visible { background: #f0fdf4; }
+        .faq-question { font-weight: 500; color: #1f2937; font-size: 15px; line-height: 1.5; flex: 1; }
+        .faq-item.is-open .faq-question { color: #166534; font-weight: 600; }
+        .faq-icon-wrapper { width: 28px; height: 28px; border-radius: 8px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease; }
+        .faq-item.is-open .faq-icon-wrapper { background: #166534; }
+        .faq-icon { width: 16px; height: 16px; color: #6b7280; transition: all 0.3s ease; transform: rotate(0deg); }
+        .faq-item.is-open .faq-icon { color: #ffffff; transform: rotate(180deg); }
+        .faq-content { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s ease; }
+        .faq-item.is-open .faq-content { grid-template-rows: 1fr; }
+        .faq-content-inner { overflow: hidden; }
+        .faq-answer { padding: 0 20px 18px 20px; color: #4b5563; font-size: 14px; line-height: 1.7; }
+        .faq-divider { height: 1px; background: linear-gradient(to right, transparent, #e5e7eb, transparent); margin: 0 20px 14px 20px; }
+
+        /* Carousel Styles */
+        .carousel-container { position: relative; overflow: hidden; border-radius: 1rem; box-shadow: 0 10px 40px rgba(22, 101, 52, 0.15); background: #f9fafb;}
+        .carousel-track { display: flex; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .carousel-slide { min-width: 100%; position: relative; }
+        .carousel-slide img { width: 100%; height: auto; display: block; object-fit: cover; aspect-ratio: 16/9; }
+        .carousel-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(5, 46, 22, 0.95) 0%, rgba(5, 46, 22, 0.7) 50%, transparent 100%); padding: 3rem 1.5rem 1.5rem; }
+        .carousel-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(255, 255, 255, 0.95); border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; z-index: 10; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+        .carousel-nav-btn:hover { background: #ffffff; transform: translateY(-50%) scale(1.1); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); }
+        .carousel-nav-btn.prev { left: 12px; }
+        .carousel-nav-btn.next { right: 12px; }
+        .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 1rem; }
+        .carousel-dot { width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
+        .carousel-dot.active { background: #166534; width: 24px; border-radius: 4px; }
+        .carousel-dot:hover { background: #22c55e; }
+        .carousel-tag { display: inline-block; padding: 0.25rem 0.75rem; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px); border-radius: 9999px; font-size: 0.75rem; font-weight: 500; color: #ffffff; margin-bottom: 0.5rem; }
+        .carousel-progress { position: absolute; bottom: 0; left: 0; height: 3px; background: #22c55e; transition: width 0.1s linear; z-index: 5; }
+
+        /* Loader Skeleton */
+        .skeleton-block { background: #e2e8f0; animation: pulse-skel 1.5s infinite; border-radius: 8px;}
+        @keyframes pulse-skel { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+
+<body class="bg-cream text-gray-900 antialiased">
+    <!-- Grain Overlay & Blobs -->
+    <div class="grain-overlay"></div>
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- RESPONSIVE NAVBAR -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 md:h-20">
+                <!-- Brand / Logo -->
+                <a href="App-script-seller.html" class="flex-shrink-0 font-display font-800 text-2xl text-gray-900 tracking-tight hover:opacity-80 transition-opacity">
+                    <span id="nav-brand-name">GSheetWeb</span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="App-script-seller.html" class="text-sm font-600 text-forest-700 hover:text-forest-600 transition-colors">Beranda</a>
+                    <a href="#solution" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Fitur & Solusi</a>
+                    <a href="katalog.html" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Katalog Produk</a>
+                    <a href="#testimonials" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Testimoni</a>
+                </nav>
+
+                <!-- Desktop CTA -->
+                <div class="hidden md:flex items-center">
+                    <a href="#conversion" class="bg-forest-700 hover:bg-forest-800 text-white px-5 py-2.5 rounded-full text-sm font-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                        Lihat Harga
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Hamburger Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobileMenuBtn" class="text-gray-600 hover:text-forest-600 focus:outline-none p-2" aria-label="Toggle Menu">
+                        <svg class="w-6 h-6" id="menuIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        <svg class="w-6 h-6 hidden" id="closeIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Dropdown -->
+        <div id="mobileMenu" class="md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-xl hidden flex-col transition-all">
+            <div class="px-4 pt-2 pb-6 space-y-1 flex flex-col">
+                <a href="App-script-seller.html" class="mobile-nav-link block px-4 py-3 text-base font-600 text-forest-700 bg-forest-50 hover:bg-forest-100 rounded-xl transition-colors">Beranda</a>
+                <a href="#solution" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Fitur & Solusi</a>
+                <a href="katalog.html" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Katalog Produk</a>
+                <a href="#testimonials" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Testimoni</a>
+                <div class="mt-4 pt-4 border-t border-gray-100 px-2">
+                    <a href="#conversion" class="mobile-nav-link w-full flex justify-center items-center bg-forest-700 text-white px-4 py-3.5 rounded-xl text-base font-600 shadow-md">Lihat Harga & Promo</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:pt-32 md:pb-12 relative z-10">
+
+        <!-- HERO SECTION -->
+        <section id="hero" class="reveal mb-12">
+            <div class="text-center mb-6">
+                <span class="inline-block px-3 py-1 text-xs font-semibold tracking-wider uppercase bg-forest-100 text-forest-700 rounded-full mb-4">Solusi Digital Untuk UMKM</span>
+                <!-- Dynamic Title & Subtitle -->
+                <h1 id="hero-title" class="font-display text-3xl md:text-5xl lg:text-6xl font-800 text-gray-900 leading-tight mb-4">
+                    <div class="skeleton-block h-12 w-3/4 mx-auto mb-2"></div><div class="skeleton-block h-12 w-1/2 mx-auto"></div>
+                </h1>
+                <p id="hero-subtitle" class="text-gray-600 text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
+                    <div class="skeleton-block h-6 w-full max-w-lg mx-auto mb-1"></div><div class="skeleton-block h-6 w-3/4 mx-auto"></div>
+                </p>
+            </div>
+
+            <!-- Video Placeholder -->
+            <div class="video-container rounded-2xl overflow-hidden aspect-video mb-8 shadow-2xl max-w-3xl mx-auto">
+                <div class="absolute inset-0 flex items-center justify-center z-10">
+                    <button class="play-btn w-20 h-20 bg-white/95 rounded-full flex items-center justify-center shadow-2xl pulse-glow" aria-label="Putar Video">
+                        <svg class="w-8 h-8 text-forest-700 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                    </button>
+                </div>
+                <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white/80 text-sm z-10">
+                    <span>Durasi: 3:45</span>
+                    <span class="flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" /></svg>2,847 views</span>
+                </div>
+            </div>
+
+            <div class="text-center max-w-sm mx-auto">
+                <a href="#conversion" class="btn-primary inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold text-lg shadow-lg">
+                    <span>Konsultasi Gratis Sekarang</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </a>
+            </div>
+        </section>
+
+        <div class="section-divider mb-12"></div>
+
+        <!-- SOLUTION SECTION -->
+        <section id="solution" class="reveal mb-12">
+            <div class="text-center mb-8">
+                <h2 class="font-display text-2xl font-700 text-gray-900 mb-2">Solusi Website Tanpa Ribet</h2>
+                <p class="text-gray-600">Digitalisasi bisnis Anda dengan cara paling sederhana</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                <!-- Card 1 -->
+                <div class="reveal reveal-delay-1 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex flex-col sm:flex-row md:flex-col items-start md:items-center gap-4 text-left md:text-center">
+                        <div class="w-12 h-12 bg-forest-100 rounded-xl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
+                        <div><h3 class="font-display font-600 text-gray-900 mb-1">Google Sheet Database</h3><p class="text-sm text-gray-600">Kelola data produk, pelanggan, dan transaksi langsung dari spreadsheet.</p></div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="reveal reveal-delay-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex flex-col sm:flex-row md:flex-col items-start md:items-center gap-4 text-left md:text-center">
+                        <div class="w-12 h-12 bg-forest-100 rounded-xl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></div>
+                        <div><h3 class="font-display font-600 text-gray-900 mb-1">Setup Cuma 5 Menit</h3><p class="text-sm text-gray-600">Tidak perlu keahlian teknis. Copy template, sesuaikan data, langsung online.</p></div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="reveal reveal-delay-3 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex flex-col sm:flex-row md:flex-col items-start md:items-center gap-4 text-left md:text-center">
+                        <div class="w-12 h-12 bg-forest-100 rounded-xl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                        <div><h3 class="font-display font-600 text-gray-900 mb-1">Tanpa Biaya Bulanan</h3><p class="text-sm text-gray-600">Tidak ada hosting, domain, atau server yang perlu dibayar. Gratis selamanya.</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider mb-12"></div>
+
+        <!-- IMPACT & CAROUSEL SECTION -->
+        <section id="impact" class="reveal mb-12">
+            <div class="text-center mb-8">
+                <h2 class="font-display text-2xl font-700 text-gray-900 mb-2">Portfolio Template</h2>
+                <p class="text-gray-600">Terintegrasi penuh dengan Google Sheet</p>
+            </div>
+
+            <!-- DYNAMIC CAROUSEL PORTFOLIO -->
+            <div class="reveal mb-6">
+                <div class="carousel-container" id="portfolioCarousel">
+                    <div class="carousel-progress" id="carouselProgress"></div>
+                    <div class="carousel-track" id="carouselTrack">
+                        <!-- Loading State -->
+                        <div class="carousel-slide flex items-center justify-center py-20 bg-gray-100">
+                            <div class="text-center">
+                                <svg class="animate-spin h-8 w-8 text-forest-600 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                <p class="text-sm text-gray-500 font-500">Memuat Katalog Produk...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <button class="carousel-nav-btn prev hidden" id="carouselPrev" aria-label="Slide sebelumnya"><svg class="w-5 h-5 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                    <button class="carousel-nav-btn next hidden" id="carouselNext" aria-label="Slide selanjutnya"><svg class="w-5 h-5 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button>
+                </div>
+                <div class="carousel-dots hidden" id="carouselDots"></div>
+            </div>
+            
+            <div class="reveal reveal-delay-1 text-center mt-8">
+                <a href="katalog.html" class="btn-secondary inline-flex items-center justify-center gap-2 py-3 px-8 rounded-xl font-semibold text-base">
+                    <span>Lihat Semua Katalog Produk</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                </a>
+            </div>
+        </section>
+
+        <div class="section-divider mb-12"></div>
+
+        <!-- CONVERSION SECTION -->
+        <section id="conversion" class="reveal mb-24">
+            <!-- Urgency Banner -->
+            <div class="reveal countdown-box rounded-xl p-4 mb-6 text-center max-w-2xl mx-auto">
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <svg class="w-5 h-5 text-amber-600 animate-pulse" fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" /></svg>
+                    <span class="font-600 text-amber-800">PERHATIAN</span>
+                </div>
+                <p class="text-sm text-amber-900">
+                    Harga naik jadi <strong id="alert-price-normal">Rp ...</strong> dalam <span id="countdown" class="font-600">Menghitung...</span>
+                </p>
+            </div>
+
+            <!-- Pricing Card -->
+            <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden max-w-2xl mx-auto">
+                <div class="bg-gradient-to-r from-forest-700 to-forest-800 p-6 text-center text-white">
+                    <p class="text-forest-200 text-sm mb-1">Investasi Sekali Bayar</p>
+                    <h3 class="font-display text-2xl font-700">Website & Landing Page Template</h3>
+                </div>
+
+                <div class="p-6 text-center border-b border-gray-100">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <span id="card-price-normal" class="text-gray-400 line-through text-lg">Rp ...</span>
+                        <span class="bg-red-100 text-red-600 text-xs font-600 px-2 py-1 rounded-full">HEMAT 90%</span>
+                    </div>
+                    <div id="card-price-today" class="text-4xl font-display font-800 text-gray-900">Rp ...</div>
+                    <p class="text-sm text-gray-500 mt-1">Pembayaran satu kali, tanpa biaya bulanan</p>
+                </div>
+
+                <div class="p-6 border-b border-gray-100">
+                    <h4 class="font-600 text-gray-900 mb-4">Yang Anda Dapatkan:</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3"><svg class="w-5 h-5 text-forest-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><div><p class="text-gray-900 font-500">Template Website Profesional</p></div></li>
+                        <li class="flex items-start gap-3"><svg class="w-5 h-5 text-forest-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><div><p class="text-gray-900 font-500">Google Sheet Database Setup</p></div></li>
+                        <li class="flex items-start gap-3"><svg class="w-5 h-5 text-forest-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><div><p class="text-gray-900 font-500">Support via WhatsApp</p></div></li>
+                    </ul>
+                </div>
+
+                <div class="p-6 bg-gray-50">
+                    <a id="btn-wa-checkout" href="#" target="_blank" class="btn-primary w-full py-4 px-6 rounded-xl font-semibold text-lg flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+                        <span>Konsultasi Gratis via WhatsApp</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="text-center py-8 border-t border-gray-200">
+            <p class="text-sm text-gray-500 mb-2">Website & Landing Page Template</p>
+            <p class="text-xs text-gray-400">Solusi digital untuk UMKM Indonesia</p>
+        </footer>
+
+    </main>
+
+    <!-- STICKY CTA MOBILE -->
+    <div class="sticky-cta fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:hidden z-50" id="stickyCta">
+        <a id="sticky-btn-wa" href="#" target="_blank" class="btn-primary w-full py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2">
+            <span>Konsultasi Gratis</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+        </a>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // ==========================================
+        // 1. PASTE URL WEB APP APPS SCRIPT DI SINI
+        // ==========================================
+        const WEB_APP_URL = "ISI_DENGAN_URL_WEB_APP_ANDA";
+
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // UI Interactions Init
+            initMobileMenu();
+            initRevealObserver();
+            initSmoothScroll();
+            initStickyCta();
+
+            // Fetch Data from Google Sheets API
+            fetchData();
+        });
+
+        async function fetchData() {
+            try {
+                if(WEB_APP_URL === "ISI_DENGAN_URL_WEB_APP_ANDA") {
+                    console.warn("Harap isi WEB_APP_URL terlebih dahulu.");
+                    return;
+                }
+
+                const response = await fetch(WEB_APP_URL, { redirect: "follow" });
+                const json = await response.json();
+                
+                if(json.status === 'success') {
+                    applySettings(json.data.settings);
+                    renderCarousel(json.data.products);
+                } else {
+                    console.error("API Error:", json.message);
+                }
+            } catch (err) {
+                console.error("Fetch Error:", err);
+            }
+        }
+
+        function applySettings(settings) {
+            // Update Texts
+            document.title = `${settings.brand_name || 'GSheetWeb'} | Landing Page Builder`;
+            document.getElementById('nav-brand-name').innerText = settings.brand_name || 'GSheetWeb';
+            
+            if(settings.hero_title) document.getElementById('hero-title').innerText = settings.hero_title;
+            if(settings.hero_subtitle) document.getElementById('hero-subtitle').innerText = settings.hero_subtitle;
+            
+            if(settings.price_normal) {
+                document.getElementById('card-price-normal').innerText = settings.price_normal;
+                document.getElementById('alert-price-normal').innerText = settings.price_normal;
+            }
+            if(settings.price_today) {
+                document.getElementById('card-price-today').innerText = settings.price_today;
+            }
+
+            // Update WA Links
+            if(settings.wa_number) {
+                const waText = encodeURIComponent("Halo, saya tertarik konsultasi pembuatan website.");
+                const waLink = `https://wa.me/${settings.wa_number}?text=${waText}`;
+                document.getElementById('btn-wa-checkout').href = waLink;
+                document.getElementById('sticky-btn-wa').href = waLink;
+            }
+
+            // Init Countdown
+            if(settings.countdown_target) {
+                initCountdown(settings.countdown_target);
+            }
+        }
+
+        function renderCarousel(products) {
+            const track = document.getElementById('carouselTrack');
+            track.innerHTML = ''; // Remove loader
+
+            if(!products || products.length === 0) return;
+
+            // Render Max 6 products for Home Carousel
+            const carouselProducts = products.slice(0, 6);
+
+            carouselProducts.forEach(prod => {
+                const slide = `
+                    <div class="carousel-slide">
+                        <img src="${prod.imgMain}" alt="${prod.title}" referrerpolicy="no-referrer">
+                        <div class="carousel-overlay">
+                            <span class="carousel-tag">${prod.category}</span>
+                            <h4 class="font-display font-600 text-white text-lg mb-1">${prod.title}</h4>
+                            <p class="text-sm text-white/80 line-clamp-1">${prod.shortDesc}</p>
+                        </div>
+                    </div>
+                `;
+                track.insertAdjacentHTML('beforeend', slide);
+            });
+
+            // Show Nav and Start Logic
+            document.getElementById('carouselPrev').classList.remove('hidden');
+            document.getElementById('carouselNext').classList.remove('hidden');
+            document.getElementById('carouselDots').classList.remove('hidden');
+            
+            initCarouselLogic();
+        }
+
+        function initCountdown(targetDateStr) {
+            const countdownEl = document.getElementById('countdown');
+            if (!countdownEl) return;
+            const deadline = new Date(targetDateStr);
+
+            function update() {
+                const now = new Date();
+                const diff = deadline - now;
+                if (diff <= 0) { countdownEl.textContent = 'Waktu Habis'; return; }
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                countdownEl.textContent = `${d} hari ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }
+            update();
+            setInterval(update, 1000);
+        }
+
+        // ==========================================
+        // UI HELPERS (Menu, Scroll, Slider)
+        // ==========================================
+        function initMobileMenu() {
+            const btn = document.getElementById('mobileMenuBtn');
+            const menu = document.getElementById('mobileMenu');
+            const mIcon = document.getElementById('menuIcon');
+            const cIcon = document.getElementById('closeIcon');
+            if (!btn || !menu) return;
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden'); menu.classList.toggle('flex');
+                mIcon.classList.toggle('hidden'); cIcon.classList.toggle('hidden');
+            });
+            menu.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    menu.classList.add('hidden'); menu.classList.remove('flex');
+                    mIcon.classList.remove('hidden'); cIcon.classList.add('hidden');
+                });
+            });
+        }
+
+        function initRevealObserver() {
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
+            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+            document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+        }
+
+        function initSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href && href !== '#' && !href.includes('.html')) {
+                        e.preventDefault();
+                        const target = document.querySelector(href);
+                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        }
+
+        function initStickyCta() {
+            const cta = document.getElementById('stickyCta');
+            const conv = document.getElementById('conversion');
+            if (cta && conv) {
+                new IntersectionObserver((entries) => {
+                    entries.forEach(e => { cta.classList[e.isIntersecting ? 'remove' : 'add']('visible'); });
+                }, { threshold: 0.1 }).observe(conv);
+            }
+        }
+
+        function initCarouselLogic() {
+            const track = document.getElementById('carouselTrack');
+            const dotsContainer = document.getElementById('carouselDots');
+            const progress = document.getElementById('carouselProgress');
+            if (!track || !dotsContainer) return;
+
+            const slides = track.querySelectorAll('.carousel-slide');
+            const total = slides.length;
+            let current = 0;
+            let autoInterval = null, progInterval = null;
+            let progWidth = 0;
+
+            dotsContainer.innerHTML = '';
+            slides.forEach((_, i) => {
+                const d = document.createElement('button');
+                d.className = `carousel-dot ${i===0 ? 'active':''}`;
+                d.onclick = () => { current = i; update(); startAuto(); };
+                dotsContainer.appendChild(d);
+            });
+            const dots = dotsContainer.querySelectorAll('.carousel-dot');
+
+            function update() {
+                track.style.transform = `translateX(-${current * 100}%)`;
+                dots.forEach((d, i) => d.classList.toggle('active', i === current));
+                progWidth = 0; if(progress) progress.style.width = '0%';
+            }
+
+            function next() { current = (current + 1) % total; update(); }
+            function prev() { current = (current - 1 + total) % total; update(); }
+
+            function startAuto() {
+                stopAuto();
+                progInterval = setInterval(() => {
+                    progWidth += (50 / 5000) * 100;
+                    if(progress) progress.style.width = `${Math.min(progWidth, 100)}%`;
+                }, 50);
+                autoInterval = setInterval(next, 5000);
+            }
+
+            function stopAuto() {
+                clearInterval(autoInterval); clearInterval(progInterval);
+            }
+
+            document.getElementById('carouselPrev').onclick = () => { prev(); startAuto(); };
+            document.getElementById('carouselNext').onclick = () => { next(); startAuto(); };
+            
+            track.parentElement.onmouseenter = stopAuto;
+            track.parentElement.onmouseleave = startAuto;
+            startAuto();
+        }
+    </script>
+</body>
+</html>
