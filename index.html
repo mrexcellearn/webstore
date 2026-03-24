@@ -125,13 +125,29 @@
         .carousel-tag { display: inline-block; padding: 0.25rem 0.75rem; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px); border-radius: 9999px; font-size: 0.75rem; font-weight: 500; color: #ffffff; margin-bottom: 0.5rem; }
         .carousel-progress { position: absolute; bottom: 0; left: 0; height: 3px; background: #22c55e; transition: width 0.1s linear; z-index: 5; }
 
+        /* Product Card (Catalog) Hover */
+        .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px -10px rgba(22, 101, 52, 0.15); }
+
+        /* Modal Animation */
+        .modal-overlay { opacity: 0; visibility: hidden; transition: all 0.3s ease-out; backdrop-filter: blur(0px); }
+        .modal-overlay.active { opacity: 1; visibility: visible; backdrop-filter: blur(4px); }
+        .modal-content { opacity: 0; transform: scale(0.95) translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-overlay.active .modal-content { opacity: 1; transform: scale(1) translateY(0); }
+        body.modal-open { overflow: hidden; }
+
         /* Loader Skeleton */
         .skeleton-block { background: #e2e8f0; animation: pulse-skel 1.5s infinite; border-radius: 8px;}
         @keyframes pulse-skel { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        /* View Animation for SPA */
+        .view-section { animation: fade-in 0.4s ease-out; }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 
-<body class="bg-cream text-gray-900 antialiased">
+<body class="bg-cream text-gray-900 antialiased min-h-screen flex flex-col">
+    <!-- Grain Overlay & Blobs -->
     <div class="grain-overlay"></div>
     <div class="bg-blobs">
         <div class="blob blob-1"></div>
@@ -139,28 +155,31 @@
         <div class="blob blob-3"></div>
     </div>
 
-    <!-- RESPONSIVE NAVBAR -->
+    <!-- RESPONSIVE NAVBAR (SPA Routing) -->
     <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 md:h-20">
-                <a href="#" class="flex-shrink-0 font-display font-800 text-2xl text-gray-900 tracking-tight hover:opacity-80 transition-opacity">
+                <!-- Brand / Logo -->
+                <button onclick="navigate('home')" class="flex-shrink-0 font-display font-800 text-2xl text-gray-900 tracking-tight hover:opacity-80 transition-opacity">
                     <span id="nav-brand-name">GSheetWeb</span>
-                </a>
+                </button>
 
+                <!-- Desktop Navigation -->
                 <nav class="hidden md:flex items-center gap-8">
-                    <!-- Anchor href cukup ID-nya saja untuk smooth scroll di halaman yang sama -->
-                    <a href="#" class="text-sm font-600 text-forest-700 hover:text-forest-600 transition-colors">Beranda</a>
-                    <a href="#solution" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Fitur & Solusi</a>
-                    <a href="katalog.html" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Katalog Produk</a>
-                    <a href="#testimonials" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Testimoni</a>
+                    <button onclick="navigate('home')" class="nav-link text-sm font-600 text-forest-700 hover:text-forest-600 transition-colors" data-target="home">Beranda</button>
+                    <button onclick="navigate('home', '#solution')" class="nav-link text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors" data-target="solution">Fitur & Solusi</button>
+                    <button onclick="navigate('catalog')" class="nav-link text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors" data-target="catalog">Katalog Produk</button>
+                    <button onclick="navigate('home', '#testimonials')" class="nav-link text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors" data-target="testimonials">Testimoni</button>
                 </nav>
 
+                <!-- Desktop CTA -->
                 <div class="hidden md:flex items-center">
-                    <a href="#conversion" class="bg-forest-700 hover:bg-forest-800 text-white px-5 py-2.5 rounded-full text-sm font-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    <button onclick="navigate('home', '#conversion')" class="bg-forest-700 hover:bg-forest-800 text-white px-5 py-2.5 rounded-full text-sm font-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                         Lihat Harga
-                    </a>
+                    </button>
                 </div>
 
+                <!-- Mobile Menu Hamburger Button -->
                 <div class="md:hidden flex items-center">
                     <button id="mobileMenuBtn" class="text-gray-600 hover:text-forest-600 focus:outline-none p-2" aria-label="Toggle Menu">
                         <svg class="w-6 h-6" id="menuIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -170,231 +189,444 @@
             </div>
         </div>
 
+        <!-- Mobile Navigation Dropdown -->
         <div id="mobileMenu" class="md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-xl hidden flex-col transition-all">
             <div class="px-4 pt-2 pb-6 space-y-1 flex flex-col">
-                <a href="#" class="mobile-nav-link block px-4 py-3 text-base font-600 text-forest-700 bg-forest-50 hover:bg-forest-100 rounded-xl transition-colors">Beranda</a>
-                <a href="#solution" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Fitur & Solusi</a>
-                <a href="katalog.html" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Katalog Produk</a>
-                <a href="#testimonials" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Testimoni</a>
+                <button onclick="navigate('home')" class="mobile-nav-link block text-left px-4 py-3 text-base font-600 text-forest-700 bg-forest-50 hover:bg-forest-100 rounded-xl transition-colors" data-target="home">Beranda</button>
+                <button onclick="navigate('home', '#solution')" class="mobile-nav-link block text-left px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors" data-target="solution">Fitur & Solusi</button>
+                <button onclick="navigate('catalog')" class="mobile-nav-link block text-left px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors" data-target="catalog">Katalog Produk</button>
+                <button onclick="navigate('home', '#testimonials')" class="mobile-nav-link block text-left px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors" data-target="testimonials">Testimoni</button>
                 <div class="mt-4 pt-4 border-t border-gray-100 px-2">
-                    <a href="#conversion" class="mobile-nav-link w-full flex justify-center items-center bg-forest-700 text-white px-4 py-3.5 rounded-xl text-base font-600 shadow-md">Lihat Harga & Promo</a>
+                    <button onclick="navigate('home', '#conversion')" class="w-full flex justify-center items-center bg-forest-700 text-white px-4 py-3.5 rounded-xl text-base font-600 shadow-md">Lihat Harga & Promo</button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:pt-32 md:pb-12 relative z-10">
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8 md:pt-32 md:pb-12 relative z-10 w-full">
 
-        <!-- HERO SECTION -->
-        <section id="hero" class="reveal mb-12">
-            <div class="text-center mb-6">
-                <span class="inline-block px-3 py-1 text-xs font-semibold tracking-wider uppercase bg-forest-100 text-forest-700 rounded-full mb-4">Solusi Digital Untuk UMKM</span>
-                <!-- Dynamic Title & Subtitle -->
-                <h1 id="hero-title" class="font-display text-3xl md:text-5xl lg:text-6xl font-800 text-gray-900 leading-tight mb-4">
-                    <div class="skeleton-block h-12 w-3/4 mx-auto mb-2"></div><div class="skeleton-block h-12 w-1/2 mx-auto"></div>
-                </h1>
-                <div id="hero-subtitle" class="text-gray-600 text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
-                    <div class="skeleton-block h-6 w-full max-w-lg mx-auto mb-1"></div><div class="skeleton-block h-6 w-3/4 mx-auto"></div>
+        <!-- ============================================== -->
+        <!-- VIEW: HOME (LANDING PAGE)                      -->
+        <!-- ============================================== -->
+        <div id="view-home" class="view-section">
+            <!-- HERO SECTION -->
+            <section id="hero" class="reveal mb-12 max-w-5xl mx-auto">
+                <div class="text-center mb-6">
+                    <span class="inline-block px-3 py-1 text-xs font-semibold tracking-wider uppercase bg-forest-100 text-forest-700 rounded-full mb-4">Solusi Digital Untuk UMKM</span>
+                    <h1 id="hero-title" class="font-display text-3xl md:text-5xl lg:text-6xl font-800 text-gray-900 leading-tight mb-4">
+                        <div class="skeleton-block h-12 w-3/4 mx-auto mb-2"></div><div class="skeleton-block h-12 w-1/2 mx-auto"></div>
+                    </h1>
+                    <div id="hero-subtitle" class="text-gray-600 text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
+                        <div class="skeleton-block h-6 w-full max-w-lg mx-auto mb-1"></div><div class="skeleton-block h-6 w-3/4 mx-auto"></div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Video Placeholder -->
-            <div class="video-container rounded-2xl overflow-hidden aspect-video mb-8 shadow-2xl max-w-3xl mx-auto">
-                <div class="absolute inset-0 flex items-center justify-center z-10">
-                    <button class="play-btn w-20 h-20 bg-white/95 rounded-full flex items-center justify-center shadow-2xl pulse-glow" aria-label="Putar Video">
-                        <svg class="w-8 h-8 text-forest-700 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                <!-- Video Placeholder -->
+                <div class="video-container rounded-2xl overflow-hidden aspect-video mb-8 shadow-2xl max-w-3xl mx-auto">
+                    <div class="absolute inset-0 flex items-center justify-center z-10">
+                        <button class="play-btn w-20 h-20 bg-white/95 rounded-full flex items-center justify-center shadow-2xl pulse-glow" aria-label="Putar Video">
+                            <svg class="w-8 h-8 text-forest-700 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                        </button>
+                    </div>
+                    <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white/80 text-sm z-10">
+                        <span>Durasi: 3:45</span>
+                        <span class="flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" /></svg>2,847 views</span>
+                    </div>
+                </div>
+
+                <div class="text-center max-w-sm mx-auto">
+                    <button onclick="navigate('home', '#conversion')" class="btn-primary inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold text-lg shadow-lg">
+                        <span>Konsultasi Gratis Sekarang</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                     </button>
                 </div>
-                <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white/80 text-sm z-10">
-                    <span>Durasi: 3:45</span>
-                    <span class="flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" /></svg>2,847 views</span>
+            </section>
+
+            <div class="section-divider mb-12 max-w-5xl mx-auto"></div>
+
+            <!-- SOLUTION SECTION -->
+            <section id="solution" class="reveal mb-12 max-w-5xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="font-display text-2xl font-700 text-gray-900 mb-2">Solusi Website Tanpa Ribet</h2>
+                    <p class="text-gray-600">Digitalisasi bisnis Anda dengan cara paling sederhana</p>
                 </div>
-            </div>
-
-            <div class="text-center max-w-sm mx-auto">
-                <a href="#conversion" class="btn-primary inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold text-lg shadow-lg">
-                    <span>Konsultasi Gratis Sekarang</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                </a>
-            </div>
-        </section>
-
-        <div class="section-divider mb-12"></div>
-
-        <!-- SOLUTION SECTION -->
-        <section id="solution" class="reveal mb-12">
-            <div class="text-center mb-8">
-                <h2 class="font-display text-2xl font-700 text-gray-900 mb-2">Solusi Website Tanpa Ribet</h2>
-                <p class="text-gray-600">Digitalisasi bisnis Anda dengan cara paling sederhana</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                <!-- Card 1 -->
-                <div class="reveal reveal-delay-1 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <div class="flex flex-col sm:flex-row md:flex-col items-start md:items-center gap-4 text-left md:text-center">
-                        <div class="w-12 h-12 bg-forest-100 rounded-xl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
-                        <div><h3 class="font-display font-600 text-gray-900 mb-1">Google Sheet Database</h3><p class="text-sm text-gray-600">Kelola data produk, pelanggan, dan transaksi langsung dari spreadsheet.</p></div>
-                    </div>
-                </div>
-                <!-- Card 2 -->
-                <div class="reveal reveal-delay-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <div class="flex flex-col sm:flex-row md:flex-col items-start md:items-center gap-4 text-left md:text-center">
-                        <div class="w-12 h-12 bg-forest-100 rounded-xl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></div>
-                        <div><h3 class="font-display font-600 text-gray-900 mb-1">Setup Cuma 5 Menit</h3><p class="text-sm text-gray-600">Tidak perlu keahlian teknis. Copy template, sesuaikan data, langsung online.</p></div>
-                    </div>
-                </div>
-                <!-- Card 3 -->
-                <div class="reveal reveal-delay-3 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <div class="flex flex-col sm:flex-row md:flex-col items-start md:items-center gap-4 text-left md:text-center">
-                        <div class="w-12 h-12 bg-forest-100 rounded-xl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                        <div><h3 class="font-display font-600 text-gray-900 mb-1">Tanpa Biaya Bulanan</h3><p class="text-sm text-gray-600">Tidak ada hosting, domain, atau server yang perlu dibayar. Gratis selamanya.</p></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <div class="section-divider mb-12"></div>
-
-        <!-- IMPACT & CAROUSEL SECTION -->
-        <section id="impact" class="reveal mb-12">
-            <div class="text-center mb-8">
-                <h2 class="font-display text-2xl font-700 text-gray-900 mb-2">Portfolio Template</h2>
-                <p class="text-gray-600">Terintegrasi penuh dengan Google Sheet</p>
-            </div>
-
-            <!-- DYNAMIC CAROUSEL PORTFOLIO -->
-            <div class="reveal mb-6">
-                <div class="carousel-container" id="portfolioCarousel">
-                    <div class="carousel-progress" id="carouselProgress"></div>
-                    <div class="carousel-track" id="carouselTrack">
-                        <!-- Loading State -->
-                        <div class="carousel-slide flex items-center justify-center py-20 bg-gray-100">
-                            <div class="text-center">
-                                <svg class="animate-spin h-8 w-8 text-forest-600 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                <p class="text-sm text-gray-500 font-500">Memuat Katalog Produk...</p>
-                            </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                    <div class="reveal reveal-delay-1 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="flex flex-col sm:flex-row md:flex-col items-start md:items-center gap-4 text-left md:text-center">
+                            <div class="w-12 h-12 bg-forest-100 rounded-xl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
+                            <div><h3 class="font-display font-600 text-gray-900 mb-1">Google Sheet Database</h3><p class="text-sm text-gray-600">Kelola data produk, pelanggan, dan transaksi langsung dari spreadsheet.</p></div>
                         </div>
                     </div>
-
-                    <!-- Navigation Buttons -->
-                    <button class="carousel-nav-btn prev hidden" id="carouselPrev" aria-label="Slide sebelumnya"><svg class="w-5 h-5 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
-                    <button class="carousel-nav-btn next hidden" id="carouselNext" aria-label="Slide selanjutnya"><svg class="w-5 h-5 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button>
-                </div>
-                <div class="carousel-dots hidden" id="carouselDots"></div>
-            </div>
-            
-            <div class="reveal reveal-delay-1 text-center mt-8">
-                <a href="katalog.html" class="btn-secondary inline-flex items-center justify-center gap-2 py-3 px-8 rounded-xl font-semibold text-base">
-                    <span>Lihat Semua Katalog Produk</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                </a>
-            </div>
-        </section>
-
-        <div class="section-divider mb-12"></div>
-
-        <!-- CONVERSION SECTION -->
-        <section id="conversion" class="reveal mb-24">
-            <!-- Urgency Banner -->
-            <div class="reveal countdown-box rounded-xl p-4 mb-6 text-center max-w-2xl mx-auto">
-                <div class="flex items-center justify-center gap-2 mb-2">
-                    <svg class="w-5 h-5 text-amber-600 animate-pulse" fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" /></svg>
-                    <span class="font-600 text-amber-800">PERHATIAN</span>
-                </div>
-                <p class="text-sm text-amber-900">
-                    Harga naik jadi <strong id="alert-price-normal">Rp ...</strong> dalam <span id="countdown" class="font-600">Menghitung...</span>
-                </p>
-            </div>
-
-            <!-- Pricing Card -->
-            <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden max-w-2xl mx-auto">
-                <div class="bg-gradient-to-r from-forest-700 to-forest-800 p-6 text-center text-white">
-                    <p class="text-forest-200 text-sm mb-1">Investasi Sekali Bayar</p>
-                    <h3 class="font-display text-2xl font-700">Website & Landing Page Template</h3>
-                </div>
-
-                <div class="p-6 text-center border-b border-gray-100">
-                    <div class="flex items-center justify-center gap-2 mb-2">
-                        <span id="card-price-normal" class="text-gray-400 line-through text-lg">Rp ...</span>
-                        <span class="bg-red-100 text-red-600 text-xs font-600 px-2 py-1 rounded-full">HEMAT 90%</span>
+                    <div class="reveal reveal-delay-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="flex flex-col sm:flex-row md:flex-col items-start md:items-center gap-4 text-left md:text-center">
+                            <div class="w-12 h-12 bg-forest-100 rounded-xl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></div>
+                            <div><h3 class="font-display font-600 text-gray-900 mb-1">Setup Cuma 5 Menit</h3><p class="text-sm text-gray-600">Tidak perlu keahlian teknis. Copy template, sesuaikan data, langsung online.</p></div>
+                        </div>
                     </div>
-                    <div id="card-price-today" class="text-4xl font-display font-800 text-gray-900">Rp ...</div>
-                    <p class="text-sm text-gray-500 mt-1">Pembayaran satu kali, tanpa biaya bulanan</p>
+                    <div class="reveal reveal-delay-3 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <div class="flex flex-col sm:flex-row md:flex-col items-start md:items-center gap-4 text-left md:text-center">
+                            <div class="w-12 h-12 bg-forest-100 rounded-xl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                            <div><h3 class="font-display font-600 text-gray-900 mb-1">Tanpa Biaya Bulanan</h3><p class="text-sm text-gray-600">Tidak ada hosting, domain, atau server yang perlu dibayar. Gratis selamanya.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="section-divider mb-12 max-w-5xl mx-auto"></div>
+
+            <!-- IMPACT & CAROUSEL SECTION -->
+            <section id="impact" class="reveal mb-12 max-w-5xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="font-display text-2xl font-700 text-gray-900 mb-2">Portfolio Template</h2>
+                    <p class="text-gray-600">Terintegrasi penuh dengan Google Sheet</p>
                 </div>
 
-                <div class="p-6 border-b border-gray-100">
-                    <h4 class="font-600 text-gray-900 mb-4">Yang Anda Dapatkan:</h4>
-                    <ul class="space-y-3">
-                        <li class="flex items-start gap-3"><svg class="w-5 h-5 text-forest-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><div><p class="text-gray-900 font-500">Template Website Profesional</p></div></li>
-                        <li class="flex items-start gap-3"><svg class="w-5 h-5 text-forest-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><div><p class="text-gray-900 font-500">Google Sheet Database Setup</p></div></li>
-                        <li class="flex items-start gap-3"><svg class="w-5 h-5 text-forest-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><div><p class="text-gray-900 font-500">Support via WhatsApp</p></div></li>
-                    </ul>
+                <div class="reveal mb-6">
+                    <div class="carousel-container" id="portfolioCarousel">
+                        <div class="carousel-progress" id="carouselProgress"></div>
+                        <div class="carousel-track" id="carouselTrack">
+                            <div class="carousel-slide flex items-center justify-center py-20 bg-gray-100">
+                                <div class="text-center">
+                                    <svg class="animate-spin h-8 w-8 text-forest-600 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <p class="text-sm text-gray-500 font-500">Memuat Katalog Produk...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-nav-btn prev hidden" id="carouselPrev"><svg class="w-5 h-5 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                        <button class="carousel-nav-btn next hidden" id="carouselNext"><svg class="w-5 h-5 text-forest-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button>
+                    </div>
+                    <div class="carousel-dots hidden" id="carouselDots"></div>
+                </div>
+                
+                <div class="reveal reveal-delay-1 text-center mt-8">
+                    <button onclick="navigate('catalog')" class="btn-secondary inline-flex items-center justify-center gap-2 py-3 px-8 rounded-xl font-semibold text-base shadow-sm">
+                        <span>Lihat Semua Katalog Produk</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    </button>
+                </div>
+            </section>
+
+            <div class="section-divider mb-12 max-w-5xl mx-auto"></div>
+
+            <!-- COMPARISON SECTION -->
+            <section id="comparison" class="reveal mb-12 max-w-5xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="font-display text-2xl font-700 text-gray-900 mb-2">Perbandingan Solusi</h2>
+                    <p class="text-gray-600">Lihat perbedaannya</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 max-w-4xl mx-auto">
+                    <div class="comparison-card bg-gray-50 rounded-2xl p-4 border border-gray-200">
+                        <div class="text-center mb-4"><span class="inline-block px-3 py-1 bg-gray-200 text-gray-600 text-xs font-semibold rounded-full">CARA LAMA</span></div>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex items-center gap-2 text-gray-600"><svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg><span>Biaya Rp 2-5 juta</span></li>
+                            <li class="flex items-center gap-2 text-gray-600"><svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg><span>Butuh 1-2 minggu</span></li>
+                            <li class="flex items-center gap-2 text-gray-600"><svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg><span>Hosting Rp 200rb/bln</span></li>
+                            <li class="flex items-center gap-2 text-gray-600"><svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" /></svg><span>Perlu developer</span></li>
+                        </ul>
+                    </div>
+                    <div class="comparison-card bg-gradient-to-br from-forest-50 to-forest-100 rounded-2xl p-4 border-2 border-forest-300">
+                        <div class="text-center mb-4"><span class="inline-block px-3 py-1 bg-forest-600 text-white text-xs font-semibold rounded-full">SOLUSI KAMI</span></div>
+                        <ul class="space-y-3 text-sm">
+                            <li class="flex items-center gap-2 text-gray-700"><svg class="w-4 h-4 text-forest-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><span>Investasi Lebih Hemat</span></li>
+                            <li class="flex items-center gap-2 text-gray-700"><svg class="w-4 h-4 text-forest-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><span>Online dalam 5 menit</span></li>
+                            <li class="flex items-center gap-2 text-gray-700"><svg class="w-4 h-4 text-forest-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><span>Gratis selamanya</span></li>
+                            <li class="flex items-center gap-2 text-gray-700"><svg class="w-4 h-4 text-forest-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><span>Tanpa coding</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <div class="section-divider mb-12 max-w-5xl mx-auto"></div>
+
+            <!-- TESTIMONIALS SECTION -->
+            <section id="testimonials" class="reveal mb-12 max-w-5xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="font-display text-2xl font-700 text-gray-900 mb-2">Testimoni Pengguna</h2>
+                    <p class="text-gray-600">Pengalaman mereka yang sudah menggunakan solusi kami</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                    <div class="reveal reveal-delay-1 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-start gap-3 mb-3"><div class="w-10 h-10 bg-forest-100 rounded-full flex items-center justify-center"><span class="font-600 text-forest-700">RA</span></div><div><p class="font-600 text-gray-900">Ratna Amelia</p><p class="text-xs text-gray-500">Pemilik Toko Online</p></div></div>
+                        <p class="text-sm text-gray-700 mb-3">"Saya hemat banyak dan bisa update produk sendiri dari HP via Google Sheet."</p>
+                    </div>
+                    <div class="reveal reveal-delay-2 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-start gap-3 mb-3"><div class="w-10 h-10 bg-forest-100 rounded-full flex items-center justify-center"><span class="font-600 text-forest-700">BS</span></div><div><p class="font-600 text-gray-900">Budi Santoso</p><p class="text-xs text-gray-500">Pemilik Restoran</p></div></div>
+                        <p class="text-sm text-gray-700 mb-3">"Sangat mudah. Menu restoran saya sekarang bisa diakses pelanggan via QR code. Praktis!"</p>
+                    </div>
+                    <div class="reveal reveal-delay-3 bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                        <div class="flex items-start gap-3 mb-3"><div class="w-10 h-10 bg-forest-100 rounded-full flex items-center justify-center"><span class="font-600 text-forest-700">DW</span></div><div><p class="font-600 text-gray-900">Dewi Wulandari</p><p class="text-xs text-gray-500">Konsultan</p></div></div>
+                        <p class="text-sm text-gray-700 mb-3">"Tampilan profesional itu penting. Website dari solusi ini bantu tingkatkan kredibilitas saya."</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="section-divider mb-12 max-w-5xl mx-auto"></div>
+
+            <!-- CONVERSION SECTION -->
+            <section id="conversion" class="reveal mb-12 max-w-5xl mx-auto">
+                <div class="reveal countdown-box rounded-xl p-4 mb-6 text-center max-w-2xl mx-auto">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-amber-600 animate-pulse" fill="currentColor" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" /></svg>
+                        <span class="font-600 text-amber-800">PERHATIAN</span>
+                    </div>
+                    <p class="text-sm text-amber-900">Harga naik jadi <strong id="alert-price-normal">Rp ...</strong> dalam <span id="countdown" class="font-600">Menghitung...</span></p>
                 </div>
 
-                <div class="p-6 bg-gray-50">
-                    <a id="btn-wa-checkout" href="#" target="_blank" class="btn-primary w-full py-4 px-6 rounded-xl font-semibold text-lg flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
-                        <span>Konsultasi Gratis via WhatsApp</span>
-                    </a>
+                <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden max-w-2xl mx-auto">
+                    <div class="bg-gradient-to-r from-forest-700 to-forest-800 p-6 text-center text-white">
+                        <p class="text-forest-200 text-sm mb-1">Investasi Sekali Bayar</p>
+                        <h3 class="font-display text-2xl font-700">Website & Landing Page Template</h3>
+                    </div>
+                    <div class="p-6 text-center border-b border-gray-100">
+                        <div class="flex items-center justify-center gap-2 mb-2">
+                            <span id="card-price-normal" class="text-gray-400 line-through text-lg">Rp ...</span>
+                            <span class="bg-red-100 text-red-600 text-xs font-600 px-2 py-1 rounded-full">HEMAT BANYAK</span>
+                        </div>
+                        <div id="card-price-today" class="text-4xl font-display font-800 text-gray-900">Rp ...</div>
+                        <p class="text-sm text-gray-500 mt-1">Pembayaran satu kali, tanpa biaya bulanan</p>
+                    </div>
+                    <div class="p-6 border-b border-gray-100">
+                        <h4 class="font-600 text-gray-900 mb-4">Yang Anda Dapatkan:</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-forest-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><div><p class="text-gray-900 font-500">Template Website Profesional</p></div></li>
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-forest-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><div><p class="text-gray-900 font-500">Google Sheet Database Setup</p></div></li>
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-forest-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" /></svg><div><p class="text-gray-900 font-500">Support via WhatsApp</p></div></li>
+                        </ul>
+                    </div>
+                    <div class="p-6 bg-gray-50">
+                        <a id="btn-wa-checkout" href="#" target="_blank" class="btn-primary w-full py-4 px-6 rounded-xl font-semibold text-lg flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+                            <span>Konsultasi Gratis via WhatsApp</span>
+                        </a>
+                    </div>
                 </div>
+            </section>
+        </div>
+        <!-- ============================================== -->
+        <!-- END VIEW: HOME                                 -->
+        <!-- ============================================== -->
+
+        <!-- ============================================== -->
+        <!-- VIEW: CATALOG                                  -->
+        <!-- ============================================== -->
+        <div id="view-catalog" class="view-section hidden">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <h1 class="font-display text-3xl md:text-4xl font-800 text-gray-900 mb-4">Katalog Web & Template</h1>
+                <p class="text-gray-600">Pilih template yang paling sesuai dengan kebutuhan bisnis Anda. Terintegrasi langsung dengan Google Sheet tanpa ribet.</p>
             </div>
-        </section>
 
-        <!-- FOOTER -->
-        <footer class="text-center py-8 border-t border-gray-200">
-            <p class="text-sm text-gray-500 mb-2">Website & Landing Page Template</p>
-            <p class="text-xs text-gray-400">Solusi digital untuk UMKM Indonesia</p>
-        </footer>
+            <!-- Filter / Tabs -->
+            <div class="flex flex-wrap justify-center gap-2 mb-10" id="filterContainer">
+                <button data-filter="Semua" class="filter-btn px-5 py-2 rounded-full bg-forest-700 text-white text-sm font-600 shadow-md transition-all">Semua</button>
+                <button data-filter="E-Commerce" class="filter-btn px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-500 hover:bg-forest-50 hover:text-forest-700 hover:border-forest-200 transition-all">E-Commerce</button>
+                <button data-filter="Company Profile" class="filter-btn px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-500 hover:bg-forest-50 hover:text-forest-700 hover:border-forest-200 transition-all">Company Profile</button>
+                <button data-filter="Tools & Kasir" class="filter-btn px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-500 hover:bg-forest-50 hover:text-forest-700 hover:border-forest-200 transition-all">Tools & Kasir</button>
+                <button data-filter="F&B" class="filter-btn px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-500 hover:bg-forest-50 hover:text-forest-700 hover:border-forest-200 transition-all">F&B</button>
+                <button data-filter="Personal Event" class="filter-btn px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-500 hover:bg-forest-50 hover:text-forest-700 hover:border-forest-200 transition-all">Personal Event</button>
+            </div>
+
+            <!-- GRID CATALOG -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="productGrid">
+                <!-- Loading Skeletons -->
+                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col p-4"><div class="aspect-[4/3] w-full skeleton-block mb-4"></div><div class="skeleton-block h-6 w-3/4 mb-2"></div><div class="skeleton-block h-4 w-full mb-1"></div><div class="skeleton-block h-4 w-5/6"></div></div>
+                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col p-4"><div class="aspect-[4/3] w-full skeleton-block mb-4"></div><div class="skeleton-block h-6 w-3/4 mb-2"></div><div class="skeleton-block h-4 w-full mb-1"></div><div class="skeleton-block h-4 w-5/6"></div></div>
+                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col p-4 hidden md:flex"><div class="aspect-[4/3] w-full skeleton-block mb-4"></div><div class="skeleton-block h-6 w-3/4 mb-2"></div><div class="skeleton-block h-4 w-full mb-1"></div><div class="skeleton-block h-4 w-5/6"></div></div>
+            </div>
+        </div>
+        <!-- ============================================== -->
+        <!-- END VIEW: CATALOG                              -->
+        <!-- ============================================== -->
 
     </main>
 
-    <!-- STICKY CTA MOBILE -->
+    <footer class="bg-white border-t border-gray-200 text-center py-8 mt-auto w-full relative z-10">
+        <p class="text-sm text-gray-500 font-500">© 2026 GSheet Web Templates. All rights reserved.</p>
+    </footer>
+
+    <!-- STICKY CTA MOBILE (Hanya di HOME) -->
     <div class="sticky-cta fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:hidden z-50" id="stickyCta">
-        <a id="sticky-btn-wa" href="#" target="_blank" class="btn-primary w-full py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2">
+        <button onclick="navigate('home', '#conversion')" class="btn-primary w-full py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2">
             <span>Konsultasi Gratis</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-        </a>
+        </button>
     </div>
 
-    <!-- MAIN JAVASCRIPT LOGIC -->
+    <!-- MODAL POPUP -->
+    <div id="productModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-gray-900/60">
+        <div class="modal-content bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
+            <button id="closeModalBtn" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-100 shadow-sm transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="overflow-y-auto flex-grow flex flex-col md:flex-row">
+                <div class="md:w-1/2 bg-gray-50 p-6 flex flex-col gap-4 border-b md:border-b-0 md:border-r border-gray-100">
+                    <div class="aspect-video w-full rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-white">
+                        <img id="modalMainImg" src="" alt="Screenshot" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+                    </div>
+                    <div class="flex gap-2 overflow-x-auto pb-2" id="modalThumbnails"></div>
+                </div>
+                <div class="md:w-1/2 p-6 pb-10 lg:p-8 lg:pb-12 flex flex-col">
+                    <span id="modalCategory" class="inline-block px-3 py-1 text-xs font-semibold tracking-wider uppercase bg-forest-100 text-forest-700 rounded-full w-max mb-3">Kategori</span>
+                    <h2 id="modalTitle" class="font-display text-2xl lg:text-3xl font-800 text-gray-900 mb-2">Nama Produk</h2>
+                    <div class="flex items-end gap-3 mb-6 pb-6 border-b border-gray-100">
+                        <span id="modalPrice" class="text-3xl font-display font-800 text-forest-700">Rp...</span>
+                        <span id="modalOldPrice" class="text-lg text-gray-400 line-through mb-1">Rp...</span>
+                    </div>
+                    <div class="prose prose-sm text-gray-600 mb-6">
+                        <p id="modalDesc">Deskripsi detail produk.</p>
+                    </div>
+                    <h4 class="font-600 text-gray-900 mb-3">Fitur Utama:</h4>
+                    <ul id="modalFeatures" class="space-y-2 mb-8 flex-grow"></ul>
+                    <div class="flex flex-col gap-3 mt-auto pt-6 pb-2 border-t border-gray-100">
+                        <a id="btn-wa-modal-order" href="#" target="_blank" class="btn-primary w-full py-3.5 px-6 rounded-xl font-semibold flex items-center justify-center gap-2">
+                            <span>Pesan Template Ini</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        </a>
+                        <a id="btn-wa-modal-consult" href="#" target="_blank" class="btn-secondary w-full py-3.5 px-6 rounded-xl font-semibold flex items-center justify-center gap-2">Konsultasi via WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC (SPA & CACHING) -->
     <script>
-        // WEB APP URL TELAH DISESUAIKAN DENGAN MILIK ANDA
+        // ==========================================
+        // 1. PASTE URL WEB APP APPS SCRIPT DI SINI
+        // ==========================================
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZsZo5D5fu3aUk4_3KocsAEEvo-UhNjmMcphmyzAHaTX8kPBo_k-_u70U0wkyWuZoAaQ/exec";
 
-        document.addEventListener('DOMContentLoaded', function () {
-            
-            // UI Interactions Init
-            initMobileMenu();
-            initRevealObserver();
-            initSmoothScroll();
-            initStickyCta();
+        let productsData = []; 
+        let settingsData = {};
 
-            // Fetch Data from Google Sheets API
-            fetchData();
+        // 1. Format Rupiah Otomatis
+        function formatRupiah(angka) {
+            if (!angka) return '';
+            // Hapus karakter selain angka
+            const cleanNumber = angka.toString().replace(/[^,\d]/g, '');
+            const parsed = parseInt(cleanNumber, 10);
+            // Jika parsing gagal/bukan angka murni, kembalikan string aslinya
+            if(isNaN(parsed)) return angka; 
+            
+            return new Intl.NumberFormat('id-ID', { 
+                style: 'currency', 
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(parsed);
+        }
+
+        // 2. SPA View Router
+        function navigate(view, hash = null) {
+            const viewHome = document.getElementById('view-home');
+            const viewCatalog = document.getElementById('view-catalog');
+            const stickyCta = document.getElementById('stickyCta');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuIcon = document.getElementById('menuIcon');
+            const closeIcon = document.getElementById('closeIcon');
+
+            // Tutup mobile menu jika sedang terbuka
+            if (!mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('flex');
+                menuIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+            }
+
+            // Atur Visibilitas
+            if (view === 'home') {
+                viewHome.classList.remove('hidden');
+                viewCatalog.classList.add('hidden');
+                if (stickyCta) stickyCta.style.display = 'block';
+
+                if (hash) {
+                    setTimeout(() => {
+                        const target = document.querySelector(hash);
+                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 50);
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            } else if (view === 'catalog') {
+                viewHome.classList.add('hidden');
+                viewCatalog.classList.remove('hidden');
+                if (stickyCta) stickyCta.style.display = 'none';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Pastikan grid catalog dirender jika belum
+                if(productsData.length > 0 && document.getElementById('productGrid').innerHTML.includes('skeleton')) {
+                    renderProducts('Semua');
+                }
+            }
+
+            // Update state menu (Desktop & Mobile)
+            document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(link => {
+                const isCatalogTarget = link.getAttribute('data-target') === 'catalog';
+                if(view === 'catalog' && isCatalogTarget) {
+                    link.classList.add('text-forest-700'); 
+                    link.classList.remove('text-gray-600', 'text-gray-800');
+                    if(link.classList.contains('mobile-nav-link')) link.classList.add('bg-forest-50');
+                } else {
+                    link.classList.remove('text-forest-700', 'bg-forest-50');
+                    link.classList.add(link.classList.contains('mobile-nav-link') ? 'text-gray-800' : 'text-gray-600');
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initMobileMenuToggle();
+            initRevealObserver();
+            initStickyCta();
+            fetchData(); // 3. Panggil fungsi Fetch dengan Cache
         });
 
+        // 3. Fetch Data dengan Session Storage Cache
         async function fetchData() {
-            try {
-                if(WEB_APP_URL === "ISI_DENGAN_URL_WEB_APP_ANDA") {
-                    console.warn("Harap isi WEB_APP_URL terlebih dahulu.");
-                    return;
-                }
+            // Cek Cache dulu agar loading instan!
+            const cachedData = sessionStorage.getItem('gsheetweb_cache');
+            if (cachedData) {
+                const json = JSON.parse(cachedData);
+                settingsData = json.settings;
+                productsData = json.products;
+                applySettings(settingsData);
+                renderCarousel(productsData);
+                renderProducts('Semua');
+                initFilters();
+            }
 
+            try {
+                if(WEB_APP_URL === "ISI_DENGAN_URL_WEB_APP_ANDA") return;
+
+                // Tarik data baru di latar belakang (Background Refresh)
                 const response = await fetch(WEB_APP_URL, { redirect: "follow" });
                 const json = await response.json();
                 
                 if(json.status === 'success') {
-                    applySettings(json.data.settings);
-                    renderCarousel(json.data.products);
-                } else {
-                    console.error("API Error:", json.message);
+                    settingsData = json.data.settings;
+                    productsData = json.data.products;
+                    
+                    // Simpan ke Cache
+                    sessionStorage.setItem('gsheetweb_cache', JSON.stringify({
+                        settings: settingsData,
+                        products: productsData
+                    }));
+
+                    // Update UI jika cache belum ada
+                    if (!cachedData) {
+                        applySettings(settingsData);
+                        renderCarousel(productsData);
+                        renderProducts('Semua');
+                        initFilters();
+                    }
                 }
             } catch (err) {
                 console.error("Fetch Error:", err);
+                if(!cachedData) {
+                    document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center py-12 text-red-500 font-600">Gagal mengambil data dari Google Sheet.</div>`;
+                }
             }
         }
 
         function applySettings(settings) {
-            // Update Texts
             document.title = `${settings.brand_name || 'GSheetWeb'} | Landing Page Builder`;
             document.getElementById('nav-brand-name').innerText = settings.brand_name || 'GSheetWeb';
             
@@ -402,39 +634,33 @@
             if(settings.hero_subtitle) document.getElementById('hero-subtitle').innerText = settings.hero_subtitle;
             
             if(settings.price_normal) {
-                document.getElementById('card-price-normal').innerText = settings.price_normal;
-                document.getElementById('alert-price-normal').innerText = settings.price_normal;
+                const formattedNormal = formatRupiah(settings.price_normal);
+                document.getElementById('card-price-normal').innerText = formattedNormal;
+                document.getElementById('alert-price-normal').innerText = formattedNormal;
             }
             if(settings.price_today) {
-                document.getElementById('card-price-today').innerText = settings.price_today;
+                document.getElementById('card-price-today').innerText = formatRupiah(settings.price_today);
             }
 
-            // Update WA Links
             if(settings.wa_number) {
                 const waText = encodeURIComponent("Halo, saya tertarik konsultasi pembuatan website.");
                 const waLink = `https://wa.me/${settings.wa_number}?text=${waText}`;
                 document.getElementById('btn-wa-checkout').href = waLink;
-                document.getElementById('sticky-btn-wa').href = waLink;
             }
 
-            // Init Countdown
-            if(settings.countdown_target) {
-                initCountdown(settings.countdown_target);
-            }
+            if(settings.countdown_target) initCountdown(settings.countdown_target);
         }
 
         function renderCarousel(products) {
             const track = document.getElementById('carouselTrack');
-            track.innerHTML = ''; // Remove loader
+            track.innerHTML = ''; 
 
             if(!products || products.length === 0) return;
 
-            // Render Max 6 products for Home Carousel
             const carouselProducts = products.slice(0, 6);
-
             carouselProducts.forEach(prod => {
                 const slide = `
-                    <div class="carousel-slide">
+                    <div class="carousel-slide cursor-pointer" onclick="navigate('catalog'); setTimeout(() => openModal(${prod.id}), 100)">
                         <img src="${prod.imgMain}" alt="${prod.title}" referrerpolicy="no-referrer">
                         <div class="carousel-overlay">
                             <span class="carousel-tag">${prod.category}</span>
@@ -446,12 +672,128 @@
                 track.insertAdjacentHTML('beforeend', slide);
             });
 
-            // Show Nav and Start Logic
             document.getElementById('carouselPrev').classList.remove('hidden');
             document.getElementById('carouselNext').classList.remove('hidden');
             document.getElementById('carouselDots').classList.remove('hidden');
-            
             initCarouselLogic();
+        }
+
+        function renderProducts(categoryFilter) {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = ''; 
+            
+            const filteredProducts = categoryFilter === 'Semua' 
+                ? productsData 
+                : productsData.filter(p => p.category === categoryFilter);
+
+            if(filteredProducts.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">Belum ada template di kategori ini.</div>`;
+                return;
+            }
+
+            filteredProducts.forEach(product => {
+                const cardHTML = `
+                    <div class="product-card bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col cursor-pointer h-full" onclick="openModal(${product.id})">
+                        <div class="aspect-[4/3] w-full bg-gray-100 overflow-hidden relative">
+                            <img src="${product.imgMain}" alt="${product.title}" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+                            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-forest-700 text-xs font-700 px-3 py-1 rounded-full shadow-sm">${product.category}</div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <h3 class="font-display font-700 text-lg text-gray-900 mb-2 leading-tight">${product.title}</h3>
+                            <p class="text-sm text-gray-500 mb-4 line-clamp-2 flex-grow">${product.shortDesc}</p>
+                            <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
+                                <div>
+                                    <div class="text-xs text-gray-400 line-through">${formatRupiah(product.oldPrice)}</div>
+                                    <div class="font-display font-800 text-forest-700 text-lg">${formatRupiah(product.price)}</div>
+                                </div>
+                                <div class="text-forest-600 font-600 text-sm flex items-center gap-1 group-hover:gap-2 transition-all">Detail <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></div>
+                            </div>
+                        </div>
+                    </div>`;
+                grid.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+
+        function initFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                // Prevent multiple event listeners issue from cache
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                
+                newBtn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('bg-forest-700', 'text-white');
+                        b.classList.add('bg-white', 'text-gray-600');
+                    });
+                    newBtn.classList.remove('bg-white', 'text-gray-600');
+                    newBtn.classList.add('bg-forest-700', 'text-white');
+                    renderProducts(newBtn.getAttribute('data-filter'));
+                });
+            });
+        }
+
+        window.openModal = function(id) {
+            const product = productsData.find(p => p.id === id);
+            if (!product) return;
+
+            document.getElementById('modalTitle').textContent = product.title;
+            document.getElementById('modalCategory').textContent = product.category;
+            document.getElementById('modalDesc').textContent = product.fullDesc;
+            document.getElementById('modalPrice').textContent = formatRupiah(product.price);
+            document.getElementById('modalOldPrice').textContent = formatRupiah(product.oldPrice);
+            document.getElementById('modalMainImg').src = product.imgMain;
+            
+            if(settingsData.wa_number) {
+                const waNum = settingsData.wa_number;
+                const txtOrder = encodeURIComponent(`Halo, saya tertarik memesan template: *${product.title}*`);
+                const txtConsult = encodeURIComponent(`Halo, saya ingin konsultasi dulu mengenai template: *${product.title}*`);
+                document.getElementById('btn-wa-modal-order').href = `https://wa.me/${waNum}?text=${txtOrder}`;
+                document.getElementById('btn-wa-modal-consult').href = `https://wa.me/${waNum}?text=${txtConsult}`;
+            }
+            
+            const thumbContainer = document.getElementById('modalThumbnails');
+            thumbContainer.innerHTML = '';
+            const allImages = [product.imgMain, ...product.images];
+            allImages.forEach(imgSrc => {
+                const thumbHTML = `
+                    <button onclick="document.getElementById('modalMainImg').src='${imgSrc}'" class="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 border-transparent hover:border-forest-500 focus:border-forest-500 transition-colors">
+                        <img src="${imgSrc}" class="w-full h-full object-cover" alt="Thumbnail" referrerpolicy="no-referrer">
+                    </button>`;
+                thumbContainer.insertAdjacentHTML('beforeend', thumbHTML);
+            });
+
+            const featuresList = document.getElementById('modalFeatures');
+            featuresList.innerHTML = '';
+            product.features.forEach(feature => {
+                const liHTML = `<li class="flex items-start gap-3 text-sm text-gray-700"><svg class="w-5 h-5 text-forest-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>${feature.trim()}</li>`;
+                featuresList.insertAdjacentHTML('beforeend', liHTML);
+            });
+
+            const modal = document.getElementById('productModal');
+            modal.classList.add('active');
+            document.body.classList.add('modal-open');
+        };
+
+        const modal = document.getElementById('productModal');
+        const closeModal = () => { modal.classList.remove('active'); document.body.classList.remove('modal-open'); };
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+        // ==========================================
+        // UI HELPERS
+        // ==========================================
+        function initMobileMenuToggle() {
+            const btn = document.getElementById('mobileMenuBtn');
+            const menu = document.getElementById('mobileMenu');
+            const mIcon = document.getElementById('menuIcon');
+            const cIcon = document.getElementById('closeIcon');
+            if (!btn || !menu) return;
+            btn.addEventListener('click', () => {
+                menu.classList.toggle('hidden'); menu.classList.toggle('flex');
+                mIcon.classList.toggle('hidden'); cIcon.classList.toggle('hidden');
+            });
         }
 
         function initCountdown(targetDateStr) {
@@ -473,45 +815,11 @@
             setInterval(update, 1000);
         }
 
-        // ==========================================
-        // UI HELPERS (Menu, Scroll, Slider)
-        // ==========================================
-        function initMobileMenu() {
-            const btn = document.getElementById('mobileMenuBtn');
-            const menu = document.getElementById('mobileMenu');
-            const mIcon = document.getElementById('menuIcon');
-            const cIcon = document.getElementById('closeIcon');
-            if (!btn || !menu) return;
-            btn.addEventListener('click', () => {
-                menu.classList.toggle('hidden'); menu.classList.toggle('flex');
-                mIcon.classList.toggle('hidden'); cIcon.classList.toggle('hidden');
-            });
-            menu.querySelectorAll('.mobile-nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    menu.classList.add('hidden'); menu.classList.remove('flex');
-                    mIcon.classList.remove('hidden'); cIcon.classList.add('hidden');
-                });
-            });
-        }
-
         function initRevealObserver() {
             const obs = new IntersectionObserver((entries) => {
                 entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
             }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
             document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-        }
-
-        function initSmoothScroll() {
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    const href = this.getAttribute('href');
-                    if (href && href !== '#' && !href.includes('.html')) {
-                        e.preventDefault();
-                        const target = document.querySelector(href);
-                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                });
-            });
         }
 
         function initStickyCta() {
@@ -563,9 +871,7 @@
                 autoInterval = setInterval(next, 5000);
             }
 
-            function stopAuto() {
-                clearInterval(autoInterval); clearInterval(progInterval);
-            }
+            function stopAuto() { clearInterval(autoInterval); clearInterval(progInterval); }
 
             document.getElementById('carouselPrev').onclick = () => { prev(); startAuto(); };
             document.getElementById('carouselNext').onclick = () => { next(); startAuto(); };
