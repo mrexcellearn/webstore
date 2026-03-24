@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Title akan diupdate JS -->
     <title id="page-title">Website & Landing Page dari Google Sheet</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -133,7 +132,6 @@
 </head>
 
 <body class="bg-cream text-gray-900 antialiased">
-    <!-- Grain Overlay & Blobs -->
     <div class="grain-overlay"></div>
     <div class="bg-blobs">
         <div class="blob blob-1"></div>
@@ -145,27 +143,24 @@
     <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 md:h-20">
-                <!-- Brand / Logo -->
-                <a href="index.html" class="flex-shrink-0 font-display font-800 text-2xl text-gray-900 tracking-tight hover:opacity-80 transition-opacity">
+                <a href="#" class="flex-shrink-0 font-display font-800 text-2xl text-gray-900 tracking-tight hover:opacity-80 transition-opacity">
                     <span id="nav-brand-name">GSheetWeb</span>
                 </a>
 
-                <!-- Desktop Navigation -->
                 <nav class="hidden md:flex items-center gap-8">
-                    <a href="index.html" class="text-sm font-600 text-forest-700 hover:text-forest-600 transition-colors">Beranda</a>
+                    <!-- Anchor href cukup ID-nya saja untuk smooth scroll di halaman yang sama -->
+                    <a href="#" class="text-sm font-600 text-forest-700 hover:text-forest-600 transition-colors">Beranda</a>
                     <a href="#solution" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Fitur & Solusi</a>
                     <a href="katalog.html" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Katalog Produk</a>
                     <a href="#testimonials" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Testimoni</a>
                 </nav>
 
-                <!-- Desktop CTA -->
                 <div class="hidden md:flex items-center">
                     <a href="#conversion" class="bg-forest-700 hover:bg-forest-800 text-white px-5 py-2.5 rounded-full text-sm font-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                         Lihat Harga
                     </a>
                 </div>
 
-                <!-- Mobile Menu Hamburger Button -->
                 <div class="md:hidden flex items-center">
                     <button id="mobileMenuBtn" class="text-gray-600 hover:text-forest-600 focus:outline-none p-2" aria-label="Toggle Menu">
                         <svg class="w-6 h-6" id="menuIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -175,10 +170,9 @@
             </div>
         </div>
 
-        <!-- Mobile Navigation Dropdown -->
         <div id="mobileMenu" class="md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-xl hidden flex-col transition-all">
             <div class="px-4 pt-2 pb-6 space-y-1 flex flex-col">
-                <a href="index.html" class="mobile-nav-link block px-4 py-3 text-base font-600 text-forest-700 bg-forest-50 hover:bg-forest-100 rounded-xl transition-colors">Beranda</a>
+                <a href="#" class="mobile-nav-link block px-4 py-3 text-base font-600 text-forest-700 bg-forest-50 hover:bg-forest-100 rounded-xl transition-colors">Beranda</a>
                 <a href="#solution" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Fitur & Solusi</a>
                 <a href="katalog.html" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Katalog Produk</a>
                 <a href="#testimonials" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Testimoni</a>
@@ -363,9 +357,7 @@
 
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
-        // ==========================================
-        // 1. PASTE URL WEB APP APPS SCRIPT DI SINI
-        // ==========================================
+        // WEB APP URL TELAH DISESUAIKAN DENGAN MILIK ANDA
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZsZo5D5fu3aUk4_3KocsAEEvo-UhNjmMcphmyzAHaTX8kPBo_k-_u70U0wkyWuZoAaQ/exec";
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -382,7 +374,7 @@
 
         async function fetchData() {
             try {
-                if(WEB_APP_URL === "https://script.google.com/macros/s/AKfycbxZsZo5D5fu3aUk4_3KocsAEEvo-UhNjmMcphmyzAHaTX8kPBo_k-_u70U0wkyWuZoAaQ/exec") {
+                if(WEB_APP_URL === "ISI_DENGAN_URL_WEB_APP_ANDA") {
                     console.warn("Harap isi WEB_APP_URL terlebih dahulu.");
                     return;
                 }
