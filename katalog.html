@@ -177,12 +177,10 @@
 
     <!-- MAIN JAVASCRIPT LOGIC -->
     <script>
-        // ==========================================
-        // 1. PASTE URL WEB APP APPS SCRIPT DI SINI
-        // ==========================================
+        // WEB APP URL sudah disematkan
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZsZo5D5fu3aUk4_3KocsAEEvo-UhNjmMcphmyzAHaTX8kPBo_k-_u70U0wkyWuZoAaQ/exec";
         
-        let productsData = []; // Menyimpan data dari sheet
+        let productsData = []; 
         let settingsData = {};
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -192,7 +190,7 @@
 
         async function fetchData() {
             try {
-                if(WEB_APP_URL === "https://script.google.com/macros/s/AKfycbxZsZo5D5fu3aUk4_3KocsAEEvo-UhNjmMcphmyzAHaTX8kPBo_k-_u70U0wkyWuZoAaQ/exec") {
+                if(WEB_APP_URL === "ISI_DENGAN_URL_WEB_APP_ANDA") {
                     document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center py-12 text-red-500 font-600">Harap isi WEB_APP_URL di file HTML.</div>`;
                     return;
                 }
@@ -206,7 +204,7 @@
                     
                     applySettings();
                     initFilters();
-                    renderProducts('Semua'); // Render awal
+                    renderProducts('Semua'); 
                 } else {
                     console.error("API Error:", json.message);
                 }
@@ -285,7 +283,6 @@
             document.getElementById('modalOldPrice').textContent = product.oldPrice;
             document.getElementById('modalMainImg').src = product.imgMain;
             
-            // WA Links
             if(settingsData.wa_number) {
                 const waNum = settingsData.wa_number;
                 const txtOrder = encodeURIComponent(`Halo, saya tertarik memesan template: *${product.title}* seharga ${product.price}`);
@@ -297,7 +294,6 @@
             const thumbContainer = document.getElementById('modalThumbnails');
             thumbContainer.innerHTML = '';
             
-            // Add Main Image as thumbnail 1
             const allImages = [product.imgMain, ...product.images];
             allImages.forEach(imgSrc => {
                 const thumbHTML = `
