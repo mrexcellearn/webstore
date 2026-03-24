@@ -362,6 +362,93 @@
 
             <div class="section-divider mb-12 max-w-5xl mx-auto"></div>
 
+            <!-- FAQ SECTION -->
+            <section id="faq" class="reveal mb-12 max-w-5xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="font-display text-2xl font-700 text-gray-900 mb-2">Pertanyaan Umum</h2>
+                    <p class="text-gray-600">Jawaban untuk pertanyaan yang sering diajukan</p>
+                </div>
+                <div class="faq-list max-w-3xl mx-auto">
+                    <!-- FAQ 1 -->
+                    <div class="faq-item reveal reveal-delay-1">
+                        <button class="faq-trigger" aria-expanded="false">
+                            <span class="faq-question">Apakah saya perlu keahlian coding?</span>
+                            <span class="faq-icon-wrapper">
+                                <svg class="faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </span>
+                        </button>
+                        <div class="faq-content">
+                            <div class="faq-content-inner">
+                                <div class="faq-divider"></div>
+                                <p class="faq-answer">Tidak perlu sama sekali. Anda hanya perlu mengisi data di Google Sheet, dan website akan otomatis terupdate. Sama seperti menggunakan spreadsheet biasa yang sudah familiar.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FAQ 2 -->
+                    <div class="faq-item reveal reveal-delay-2">
+                        <button class="faq-trigger" aria-expanded="false">
+                            <span class="faq-question">Bagaimana cara pembayarannya?</span>
+                            <span class="faq-icon-wrapper">
+                                <svg class="faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </span>
+                        </button>
+                        <div class="faq-content">
+                            <div class="faq-content-inner">
+                                <div class="faq-divider"></div>
+                                <p class="faq-answer">Pembayaran dilakukan satu kali saja (bukan langganan). Anda bisa bayar via transfer bank, e-wallet, atau QRIS. Setelah pembayaran, tim kami akan menghubungi Anda untuk proses selanjutnya.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FAQ 3 -->
+                    <div class="faq-item reveal reveal-delay-3">
+                        <button class="faq-trigger" aria-expanded="false">
+                            <span class="faq-question">Apakah ada biaya bulanan?</span>
+                            <span class="faq-icon-wrapper">
+                                <svg class="faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </span>
+                        </button>
+                        <div class="faq-content">
+                            <div class="faq-content-inner">
+                                <div class="faq-divider"></div>
+                                <p class="faq-answer">Tidak ada. Website menggunakan platform gratis dengan Google Sheet sebagai database. Anda tidak perlu membayar hosting, domain, atau server. Gratis selamanya.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FAQ 4 -->
+                    <div class="faq-item reveal reveal-delay-4">
+                        <button class="faq-trigger" aria-expanded="false">
+                            <span class="faq-question">Apakah bisa dikustomisasi sesuai brand saya?</span>
+                            <span class="faq-icon-wrapper">
+                                <svg class="faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </span>
+                        </button>
+                        <div class="faq-content">
+                            <div class="faq-content-inner">
+                                <div class="faq-divider"></div>
+                                <p class="faq-answer">Ya, bisa. Template yang kami sediakan dapat disesuaikan dengan brand bisnis Anda termasuk warna, logo, dan layout. Untuk kustomisasi lebih lanjut, tim kami siap membantu.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FAQ 5 -->
+                    <div class="faq-item reveal reveal-delay-4">
+                        <button class="faq-trigger" aria-expanded="false">
+                            <span class="faq-question">Bagaimana jika saya butuh bantuan teknis?</span>
+                            <span class="faq-icon-wrapper">
+                                <svg class="faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </span>
+                        </button>
+                        <div class="faq-content">
+                            <div class="faq-content-inner">
+                                <div class="faq-divider"></div>
+                                <p class="faq-answer">Tim kami menyediakan dukungan via WhatsApp untuk membantu menjawab pertanyaan atau kendala teknis. Response time maksimal 1x24 jam pada hari kerja.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="section-divider mb-12 max-w-5xl mx-auto"></div>
+
             <!-- CONVERSION SECTION -->
             <section id="conversion" class="reveal mb-12 max-w-5xl mx-auto">
                 <div class="reveal countdown-box rounded-xl p-4 mb-6 text-center max-w-2xl mx-auto">
@@ -536,7 +623,7 @@
             if (view === 'home') {
                 viewHome.classList.remove('hidden');
                 viewCatalog.classList.add('hidden');
-                if (stickyCta) stickyCta.style.display = 'block';
+                if (stickyCta) stickyCta.style.display = ''; // <-- PERBAIKAN DI SINI: Hapus 'block' agar md:hidden kembali bekerja di Laptop
 
                 if (hash) {
                     setTimeout(() => {
@@ -576,6 +663,7 @@
             initMobileMenuToggle();
             initRevealObserver();
             initStickyCta();
+            initFaqAccordion();
             fetchData(); // 3. Panggil fungsi Fetch dengan Cache
         });
 
@@ -793,6 +881,33 @@
             btn.addEventListener('click', () => {
                 menu.classList.toggle('hidden'); menu.classList.toggle('flex');
                 mIcon.classList.toggle('hidden'); cIcon.classList.toggle('hidden');
+            });
+        }
+
+        function initFaqAccordion() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const trigger = item.querySelector('.faq-trigger');
+                trigger.addEventListener('click', function () {
+                    const isOpen = item.classList.contains('is-open');
+
+                    // Close all other items
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('is-open');
+                            otherItem.querySelector('.faq-trigger').setAttribute('aria-expanded', 'false');
+                        }
+                    });
+
+                    // Toggle current item
+                    if (isOpen) {
+                        item.classList.remove('is-open');
+                        trigger.setAttribute('aria-expanded', 'false');
+                    } else {
+                        item.classList.add('is-open');
+                        trigger.setAttribute('aria-expanded', 'true');
+                    }
+                });
             });
         }
 
