@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog Produk & Template | Google Sheet Website</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        forest: { 50: '#f0fdf4', 100: '#dcfce7', 200: '#bbf7d0', 300: '#86efac', 400: '#4ade80', 500: '#22c55e', 600: '#16a34a', 700: '#166534', 800: '#14532d', 900: '#052e16' },
+                        cream: '#fefdfb', sand: '#f8f6f1'
+                    },
+                    fontFamily: {
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                        body: ['DM Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root { --bg: #fefdfb; --fg: #0f2922; --muted: #5a6b65; --accent: #166534; --accent-light: #22c55e; --card: #ffffff; --border: #e2e8f0; }
+        * { fontFamily: 'DM Sans', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-display { fontFamily: 'Plus Jakarta Sans', sans-serif; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px;}
+
+        .btn-primary { text-decoration: none !important; background: linear-gradient(135deg, #166534 0%, #14532d 100%); color: #ffffff !important; transition: all 0.3s ease; }
+        .btn-primary:hover { background: linear-gradient(135deg, #14532d 0%, #052e16 100%); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(22, 101, 52, 0.35); }
+        .btn-secondary { text-decoration: none !important; background: transparent; color: #166534 !important; border: 2px solid #166534; transition: all 0.3s ease; }
+        .btn-secondary:hover { background: #f0fdf4; transform: translateY(-2px); }
+
+        .grain-overlay { position: fixed; inset: 0; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); z-index: 9999; }
+
+        .bg-blobs { position: fixed; inset: 0; z-index: -3; overflow: hidden; pointer-events: none; background-color: var(--bg); }
+        .blob { position: absolute; filter: blur(90px); border-radius: 50%; opacity: 0.5; animation: float-blob 20s infinite ease-in-out alternate; will-change: transform; }
+        .blob-1 { width: 40vw; height: 40vw; background: #dcfce7; top: -10%; left: -10%; animation-delay: 0s; }
+        .blob-2 { width: 50vw; height: 50vw; background: #bbf7d0; bottom: -20%; right: -10%; animation-duration: 25s; animation-delay: -5s; }
+        .blob-3 { width: 35vw; height: 35vw; background: #fef3c7; top: 20%; right: 20%; animation-duration: 30s; animation-delay: -10s; }
+        @keyframes float-blob { 0% { transform: translate(0, 0) scale(1); } 33% { transform: translate(3vw, -5vh) scale(1.1); } 66% { transform: translate(-2vw, 4vh) scale(0.9); } 100% { transform: translate(0, 0) scale(1); } }
+
+        .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px -10px rgba(22, 101, 52, 0.15); }
+
+        .modal-overlay { opacity: 0; visibility: hidden; transition: all 0.3s ease-out; backdrop-filter: blur(0px); }
+        .modal-overlay.active { opacity: 1; visibility: visible; backdrop-filter: blur(4px); }
+        .modal-content { opacity: 0; transform: scale(0.95) translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-overlay.active .modal-content { opacity: 1; transform: scale(1) translateY(0); }
+        body.modal-open { overflow: hidden; }
+
+        /* Loader Skeleton */
+        .skeleton-block { background: #e2e8f0; animation: pulse-skel 1.5s infinite; border-radius: 8px;}
+        @keyframes pulse-skel { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+
+<body class="bg-cream text-gray-900 antialiased min-h-screen flex flex-col">
+    <div class="grain-overlay"></div>
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- RESPONSIVE NAVBAR -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 md:h-20">
+                <a href="App-script-seller.html" class="flex-shrink-0 font-display font-800 text-2xl text-gray-900 tracking-tight hover:opacity-80 transition-opacity">
+                    <span id="nav-brand-name">GSheetWeb</span>
+                </a>
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="App-script-seller.html" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Beranda</a>
+                    <a href="App-script-seller.html#solution" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Fitur & Solusi</a>
+                    <a href="katalog.html" class="text-sm font-600 text-forest-700 hover:text-forest-600 transition-colors">Katalog Produk</a>
+                    <a href="App-script-seller.html#testimonials" class="text-sm font-600 text-gray-600 hover:text-forest-600 transition-colors">Testimoni</a>
+                </nav>
+                <div class="hidden md:flex items-center">
+                    <a href="App-script-seller.html#conversion" class="bg-forest-700 hover:bg-forest-800 text-white px-5 py-2.5 rounded-full text-sm font-600 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                        Lihat Harga
+                    </a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobileMenuBtn" class="text-gray-600 hover:text-forest-600 focus:outline-none p-2" aria-label="Toggle Menu">
+                        <svg class="w-6 h-6" id="menuIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        <svg class="w-6 h-6 hidden" id="closeIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobileMenu" class="md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-xl hidden flex-col transition-all">
+            <div class="px-4 pt-2 pb-6 space-y-1 flex flex-col">
+                <a href="App-script-seller.html" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Beranda</a>
+                <a href="App-script-seller.html#solution" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Fitur & Solusi</a>
+                <a href="katalog.html" class="mobile-nav-link block px-4 py-3 text-base font-600 text-forest-700 bg-forest-50 hover:bg-forest-100 rounded-xl transition-colors">Katalog Produk</a>
+                <a href="App-script-seller.html#testimonials" class="mobile-nav-link block px-4 py-3 text-base font-600 text-gray-800 hover:bg-forest-50 hover:text-forest-700 rounded-xl transition-colors">Testimoni</a>
+                <div class="mt-4 pt-4 border-t border-gray-100 px-2">
+                    <a href="App-script-seller.html#conversion" class="mobile-nav-link w-full flex justify-center items-center bg-forest-700 text-white px-4 py-3.5 rounded-xl text-base font-600 shadow-md">Lihat Harga & Promo</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 md:pt-32 w-full relative z-10">
+        
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <h1 class="font-display text-3xl md:text-4xl font-800 text-gray-900 mb-4">Katalog Web & Template</h1>
+            <p class="text-gray-600">Pilih template yang paling sesuai dengan kebutuhan bisnis Anda. Semua terintegrasi langsung dengan Google Sheet tanpa ribet.</p>
+        </div>
+
+        <!-- Filter / Tabs -->
+        <div class="flex flex-wrap justify-center gap-2 mb-10" id="filterContainer">
+            <button data-filter="Semua" class="filter-btn px-5 py-2 rounded-full bg-forest-700 text-white text-sm font-600 shadow-md transition-all">Semua</button>
+            <button data-filter="E-Commerce" class="filter-btn px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-500 hover:bg-forest-50 hover:text-forest-700 hover:border-forest-200 transition-all">E-Commerce</button>
+            <button data-filter="Company Profile" class="filter-btn px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-500 hover:bg-forest-50 hover:text-forest-700 hover:border-forest-200 transition-all">Company Profile</button>
+            <button data-filter="Tools & Kasir" class="filter-btn px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-500 hover:bg-forest-50 hover:text-forest-700 hover:border-forest-200 transition-all">Tools & Kasir</button>
+            <button data-filter="F&B" class="filter-btn px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-500 hover:bg-forest-50 hover:text-forest-700 hover:border-forest-200 transition-all">F&B</button>
+            <button data-filter="Personal Event" class="filter-btn px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-sm font-500 hover:bg-forest-50 hover:text-forest-700 hover:border-forest-200 transition-all">Personal Event</button>
+        </div>
+
+        <!-- GRID CATALOG -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="productGrid">
+            <!-- Loading Skeletons -->
+            <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col p-4"><div class="aspect-[4/3] w-full skeleton-block mb-4"></div><div class="skeleton-block h-6 w-3/4 mb-2"></div><div class="skeleton-block h-4 w-full mb-1"></div><div class="skeleton-block h-4 w-5/6"></div></div>
+            <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col p-4"><div class="aspect-[4/3] w-full skeleton-block mb-4"></div><div class="skeleton-block h-6 w-3/4 mb-2"></div><div class="skeleton-block h-4 w-full mb-1"></div><div class="skeleton-block h-4 w-5/6"></div></div>
+            <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col p-4 hidden md:flex"><div class="aspect-[4/3] w-full skeleton-block mb-4"></div><div class="skeleton-block h-6 w-3/4 mb-2"></div><div class="skeleton-block h-4 w-full mb-1"></div><div class="skeleton-block h-4 w-5/6"></div></div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 text-center py-8 mt-auto">
+        <p class="text-sm text-gray-500 font-500">© 2026 GSheet Web Templates. All rights reserved.</p>
+    </footer>
+
+    <!-- MODAL POPUP -->
+    <div id="productModal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-gray-900/60">
+        <div class="modal-content bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
+            <button id="closeModalBtn" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-100 shadow-sm transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div class="overflow-y-auto flex-grow flex flex-col md:flex-row">
+                <div class="md:w-1/2 bg-gray-50 p-6 flex flex-col gap-4 border-b md:border-b-0 md:border-r border-gray-100">
+                    <div class="aspect-video w-full rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-white">
+                        <img id="modalMainImg" src="" alt="Screenshot" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+                    </div>
+                    <div class="flex gap-2 overflow-x-auto pb-2" id="modalThumbnails"></div>
+                </div>
+                <div class="md:w-1/2 p-6 pb-10 lg:p-8 lg:pb-12 flex flex-col">
+                    <span id="modalCategory" class="inline-block px-3 py-1 text-xs font-semibold tracking-wider uppercase bg-forest-100 text-forest-700 rounded-full w-max mb-3">Kategori</span>
+                    <h2 id="modalTitle" class="font-display text-2xl lg:text-3xl font-800 text-gray-900 mb-2">Nama Produk</h2>
+                    <div class="flex items-end gap-3 mb-6 pb-6 border-b border-gray-100">
+                        <span id="modalPrice" class="text-3xl font-display font-800 text-forest-700">Rp...</span>
+                        <span id="modalOldPrice" class="text-lg text-gray-400 line-through mb-1">Rp...</span>
+                    </div>
+                    <div class="prose prose-sm text-gray-600 mb-6">
+                        <p id="modalDesc">Deskripsi detail produk.</p>
+                    </div>
+                    <h4 class="font-600 text-gray-900 mb-3">Fitur Utama:</h4>
+                    <ul id="modalFeatures" class="space-y-2 mb-8 flex-grow"></ul>
+                    <div class="flex flex-col gap-3 mt-auto pt-6 pb-2 border-t border-gray-100">
+                        <a id="btn-wa-checkout" href="#" target="_blank" class="btn-primary w-full py-3.5 px-6 rounded-xl font-semibold flex items-center justify-center gap-2">
+                            <span>Pesan Template Ini</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        </a>
+                        <a id="btn-wa-consult" href="#" target="_blank" class="btn-secondary w-full py-3.5 px-6 rounded-xl font-semibold flex items-center justify-center gap-2">Konsultasi via WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // ==========================================
+        // 1. PASTE URL WEB APP APPS SCRIPT DI SINI
+        // ==========================================
+        const WEB_APP_URL = "ISI_DENGAN_URL_WEB_APP_ANDA";
+        
+        let productsData = []; // Menyimpan data dari sheet
+        let settingsData = {};
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initMobileMenu();
+            fetchData();
+        });
+
+        async function fetchData() {
+            try {
+                if(WEB_APP_URL === "ISI_DENGAN_URL_WEB_APP_ANDA") {
+                    document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center py-12 text-red-500 font-600">Harap isi WEB_APP_URL di file HTML.</div>`;
+                    return;
+                }
+
+                const response = await fetch(WEB_APP_URL, { redirect: "follow" });
+                const json = await response.json();
+                
+                if(json.status === 'success') {
+                    settingsData = json.data.settings;
+                    productsData = json.data.products;
+                    
+                    applySettings();
+                    initFilters();
+                    renderProducts('Semua'); // Render awal
+                } else {
+                    console.error("API Error:", json.message);
+                }
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                document.getElementById('productGrid').innerHTML = `<div class="col-span-full text-center py-12 text-red-500 font-600">Gagal mengambil data dari Google Sheet.</div>`;
+            }
+        }
+
+        function applySettings() {
+            if(settingsData.brand_name) {
+                document.title = `Katalog | ${settingsData.brand_name}`;
+                document.getElementById('nav-brand-name').innerText = settingsData.brand_name;
+            }
+        }
+
+        function renderProducts(categoryFilter) {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = ''; 
+            
+            const filteredProducts = categoryFilter === 'Semua' 
+                ? productsData 
+                : productsData.filter(p => p.category === categoryFilter);
+
+            if(filteredProducts.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">Belum ada template di kategori ini.</div>`;
+                return;
+            }
+
+            filteredProducts.forEach(product => {
+                const cardHTML = `
+                    <div class="product-card bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col cursor-pointer h-full" onclick="openModal(${product.id})">
+                        <div class="aspect-[4/3] w-full bg-gray-100 overflow-hidden relative">
+                            <img src="${product.imgMain}" alt="${product.title}" class="w-full h-full object-cover" referrerpolicy="no-referrer">
+                            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-forest-700 text-xs font-700 px-3 py-1 rounded-full shadow-sm">${product.category}</div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <h3 class="font-display font-700 text-lg text-gray-900 mb-2 leading-tight">${product.title}</h3>
+                            <p class="text-sm text-gray-500 mb-4 line-clamp-2 flex-grow">${product.shortDesc}</p>
+                            <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
+                                <div>
+                                    <div class="text-xs text-gray-400 line-through">${product.oldPrice}</div>
+                                    <div class="font-display font-800 text-forest-700 text-lg">${product.price}</div>
+                                </div>
+                                <div class="text-forest-600 font-600 text-sm flex items-center gap-1 group-hover:gap-2 transition-all">Detail <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></div>
+                            </div>
+                        </div>
+                    </div>`;
+                grid.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+
+        function initFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => {
+                        b.classList.remove('bg-forest-700', 'text-white');
+                        b.classList.add('bg-white', 'text-gray-600');
+                    });
+                    btn.classList.remove('bg-white', 'text-gray-600');
+                    btn.classList.add('bg-forest-700', 'text-white');
+                    renderProducts(btn.getAttribute('data-filter'));
+                });
+            });
+        }
+
+        window.openModal = function(id) {
+            const product = productsData.find(p => p.id === id);
+            if (!product) return;
+
+            document.getElementById('modalTitle').textContent = product.title;
+            document.getElementById('modalCategory').textContent = product.category;
+            document.getElementById('modalDesc').textContent = product.fullDesc;
+            document.getElementById('modalPrice').textContent = product.price;
+            document.getElementById('modalOldPrice').textContent = product.oldPrice;
+            document.getElementById('modalMainImg').src = product.imgMain;
+            
+            // WA Links
+            if(settingsData.wa_number) {
+                const waNum = settingsData.wa_number;
+                const txtOrder = encodeURIComponent(`Halo, saya tertarik memesan template: *${product.title}* seharga ${product.price}`);
+                const txtConsult = encodeURIComponent(`Halo, saya ingin konsultasi dulu mengenai template: *${product.title}*`);
+                document.getElementById('btn-wa-checkout').href = `https://wa.me/${waNum}?text=${txtOrder}`;
+                document.getElementById('btn-wa-consult').href = `https://wa.me/${waNum}?text=${txtConsult}`;
+            }
+            
+            const thumbContainer = document.getElementById('modalThumbnails');
+            thumbContainer.innerHTML = '';
+            
+            // Add Main Image as thumbnail 1
+            const allImages = [product.imgMain, ...product.images];
+            allImages.forEach(imgSrc => {
+                const thumbHTML = `
+                    <button onclick="document.getElementById('modalMainImg').src='${imgSrc}'" class="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border-2 border-transparent hover:border-forest-500 focus:border-forest-500 transition-colors">
+                        <img src="${imgSrc}" class="w-full h-full object-cover" alt="Thumbnail" referrerpolicy="no-referrer">
+                    </button>`;
+                thumbContainer.insertAdjacentHTML('beforeend', thumbHTML);
+            });
+
+            const featuresList = document.getElementById('modalFeatures');
+            featuresList.innerHTML = '';
+            product.features.forEach(feature => {
+                const liHTML = `<li class="flex items-start gap-3 text-sm text-gray-700"><svg class="w-5 h-5 text-forest-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>${feature.trim()}</li>`;
+                featuresList.insertAdjacentHTML('beforeend', liHTML);
+            });
+
+            const modal = document.getElementById('productModal');
+            modal.classList.add('active');
+            document.body.classList.add('modal-open');
+        };
+
+        const modal = document.getElementById('productModal');
+        const closeModal = () => { modal.classList.remove('active'); document.body.classList.remove('modal-open'); };
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+        function initMobileMenu() {
+            const btn = document.getElementById('mobileMenuBtn'), menu = document.getElementById('mobileMenu'), mIcon = document.getElementById('menuIcon'), cIcon = document.getElementById('closeIcon');
+            if (!btn || !menu) return;
+            btn.addEventListener('click', () => { menu.classList.toggle('hidden'); menu.classList.toggle('flex'); mIcon.classList.toggle('hidden'); cIcon.classList.toggle('hidden'); });
+            menu.querySelectorAll('.mobile-nav-link').forEach(link => { link.addEventListener('click', () => { menu.classList.add('hidden'); menu.classList.remove('flex'); mIcon.classList.remove('hidden'); cIcon.classList.add('hidden'); }); });
+        }
+    </script>
+</body>
+</html>
